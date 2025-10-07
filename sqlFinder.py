@@ -36,6 +36,7 @@ def sql_finder2(file_name):
             sql = sql + word.strip() + ' '
         else:
             sql = sql + word.strip()
+            sql = sql.strip()
             sqls.append(sql)
             sql = ''
     # print(sqls)
@@ -65,7 +66,7 @@ def check_for_create(list_of_queries, keyword,index):
     table_name = query[len(keyword):].strip()
     if '/' in table_name:
         table_name = table_name.replace('/', '')
-    print("table_name: ", table_name)
+    # print("table_name: ", table_name)
     string_to_check = 'CREATE TABLE '+ table_name
     for query_string in list_of_queries[index:]:
         if string_to_check in query_string.strip() :
@@ -94,16 +95,19 @@ def run_validation_rules():
                 sql_query = sql_query.strip()
                 # print(sql_query)
                 try:
+                    valid_sql = False
                     if sql_query.startswith('UPDATE'):
                         check_for_where(sql_query, 'UPDATE')
                     elif sql_query.startswith('DELETE'):
                         check_for_where(sql_query, 'DELETE')
                     elif sql_query.startswith('DROP TABLE'):
+
                         if sql_query.startswith('DROP TABLE IF EXISTS'):
                             index = list_sqls.index(sql_query)
                             check_for_create(list_sqls,'DROP TABLE IF EXISTS',index)
                         else:
-                            check_for_where(sql_query, 'DROP TABLE')
+                            index = list_sqls.index(sql_query)
+                            check_for_create(list_sqls,'DROP TABLE',index)
                     elif sql_query.startswith('GRANT'):
                         check_for_grant(sql_query, 'GRANT')
                         
